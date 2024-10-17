@@ -15,34 +15,38 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-
 @WebServlet("/Cadastrar")
 public class CadastrarServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String tipoCadastro = request.getParameter("tipoCadastro");
         String nome = request.getParameter("nome");
         String email = request.getParameter("email");
         String cep = request.getParameter("cep");
-        String numeroStr = request.getParameter("numero"); // Removido trim() aqui
+        String numeroStr = request.getParameter("numero");
         String dataNascStr = request.getParameter("data_Nasc");
-        String telefoneStr = request.getParameter("telefone"); // Removido trim() aqui
+        String telefoneStr = request.getParameter("telefone"); // Telefone como String
         String senha = request.getParameter("senha");
 
-        // Validação básica
-        if (isNullOrEmpty(nome) || isNullOrEmpty(email) || isNullOrEmpty(cep) || isNullOrEmpty(numeroStr) ||
-                isNullOrEmpty(dataNascStr) || isNullOrEmpty(telefoneStr) || isNullOrEmpty(senha)) {
-            request.setAttribute("errorMessage", "Todos os campos são obrigatórios.");
+        // Verificação de campos obrigatórios
+        if (tipoCadastro.equals("admin") && isNullOrEmpty(nome)) {
+            request.setAttribute("errorMessage", "O campo nome é obrigatório para Administradores.");
+            request.getRequestDispatcher("cadastro.jsp").forward(request, response);
+            return;
+        }
+        if (isNullOrEmpty(email) || isNullOrEmpty(senha)) {
+            request.setAttribute("errorMessage", "E-mail e Senha são obrigatórios.");
             request.getRequestDispatcher("cadastro.jsp").forward(request, response);
             return;
         }
 
-        // Verificação se numero e telefone são numéricos
-        if (!numeroStr.matches("\\d+") || !telefoneStr.matches("\\d+")) {
-            request.setAttribute("errorMessage", "Número e Telefone devem ser numéricos.");
+        // Verificação se número é numérico
+        if (!numeroStr.matches("\\d+")) {
+            request.setAttribute("errorMessage", "Número deve ser numérico.");
             request.getRequestDispatcher("cadastro.jsp").forward(request, response);
             return;
         }
 
-        // Busca o endereço pelo CEP
+        // Verificação do CEP
         Cadastro enderecoData;
         try {
             enderecoData = CepService.buscarCep(cep);
@@ -57,20 +61,18 @@ public class CadastrarServlet extends HttpServlet {
             return;
         }
 
-        // Conversão e validação
+        // Conversão de dados
         int numero;
-        long telefone;
         Calendar dataNasc;
         try {
             numero = Integer.parseInt(numeroStr);
-            telefone = Long.parseLong(telefoneStr);
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
             Date date = sdf.parse(dataNascStr);
 
             dataNasc = Calendar.getInstance();
             dataNasc.setTime(date);
         } catch (NumberFormatException e) {
-            request.setAttribute("errorMessage", "Erro de conversão em número ou telefone: " + e.getMessage());
+            request.setAttribute("errorMessage", "Erro de conversão em número: " + e.getMessage());
             request.getRequestDispatcher("cadastro.jsp").forward(request, response);
             return;
         } catch (ParseException e) {
@@ -79,14 +81,22 @@ public class CadastrarServlet extends HttpServlet {
             return;
         }
 
-        // Criação do objeto Cadastro
+        // Cria o objeto Cadastro
         Cadastro cadastro = new Cadastro(nome, email, enderecoData.getLogradouro(), enderecoData.getCidade(),
                 enderecoData.getEstado(), enderecoData.getBairro(), numero, cep,
-                dataNasc, telefone, senha);
+                dataNasc, telefoneStr, senha, tipoCadastro.equals("admin")); // Telefone como String
 
         try {
             CadastroDao cadastroDao = new CadastroDao();
-            cadastroDao.adicionar(cadastro);
+            int usuarioId = cadastroDao.adicionarUsuario(cadastro); // Captura o ID gerado
+
+            // Verifica o tipo de cadastro e adiciona à tabela correspondente
+            if (tipoCadastro.equals("admin")) {
+                cadastroDao.adicionarAdministrador(usuarioId, cadastro);
+            } else {
+                cadastroDao.adicionarCliente(usuarioId, cadastro);
+            }
+
             request.setAttribute("successMessage", "Cadastro realizado com sucesso!");
             request.getRequestDispatcher("cadastro.jsp").forward(request, response);
         } catch (SQLException e) {
@@ -95,7 +105,6 @@ public class CadastrarServlet extends HttpServlet {
         }
     }
 
-    // Método auxiliar para verificar se uma String é nula ou vazia
     private boolean isNullOrEmpty(String str) {
         return str == null || str.trim().isEmpty();
     }

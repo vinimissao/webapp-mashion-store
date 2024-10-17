@@ -2,110 +2,148 @@ package com.example.dao;
 
 import com.example.Conexao.Conexao;
 import com.example.Modelo.Cadastro;
-
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
+import java.util.Calendar;
 
 public class CadastroDao {
-    private final Connection connection;
+
+    private Connection connection;
 
     public CadastroDao() throws SQLException {
         Conexao cf = new Conexao();
         this.connection = cf.getConnection();
-        criarTabela();
-        verificarEstruturaTabela();
-        testarConexao();
     }
 
-    public CadastroDao(Connection connection) {
-        this.connection = connection;
-        criarTabela();
-        verificarEstruturaTabela();
-        testarConexao();
-    }
+    public int adicionarUsuario(Cadastro cadastro) throws SQLException {
+        String sql = "INSERT INTO usuarios (nome, email, telefone, data_nascimento, senha, is_admin) VALUES (?, ?, ?, ?, ?, ?)";
 
-    private void criarTabela() {
-        String sql = """
-        CREATE TABLE IF NOT EXISTS Cadastro (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            nome VARCHAR(255) NOT NULL,
-            email VARCHAR(255) NOT NULL,
-            logradouro VARCHAR(255),
-            cidade VARCHAR(255),
-            estado VARCHAR(50),
-            bairro VARCHAR(255),
-            numero INT,
-            cep VARCHAR(20),
-            data_Nasc DATE,
-            telefone BIGINT,
-            senha VARCHAR(255)
-        );
-        """;
-        try (Statement stmt = connection.createStatement()) {
-            stmt.execute(sql);
-            System.out.println("Tabela 'Cadastro' criada ou verificada com sucesso.");
-        } catch (SQLException e) {
-            throw new RuntimeException("Erro ao criar tabela 'Cadastro': " + e.getMessage(), e);
-        }
-    }
-
-    private void verificarEstruturaTabela() {
-        adicionarColuna("logradouro", "VARCHAR(255)");
-        adicionarColuna("cidade", "VARCHAR(255)");
-        adicionarColuna("estado", "VARCHAR(50)");
-        adicionarColuna("bairro", "VARCHAR(255)");
-        adicionarColuna("numero", "INT");
-        adicionarColuna("cep", "VARCHAR(20)");
-    }
-
-    private void adicionarColuna(String nomeColuna, String tipoColuna) {
-        String sql = "ALTER TABLE Cadastro ADD COLUMN " + nomeColuna + " " + tipoColuna;
-        try (Statement stmt = connection.createStatement()) {
-            stmt.execute(sql);
-            System.out.println("Coluna '" + nomeColuna + "' adicionada à tabela 'Cadastro'.");
-        } catch (SQLException e) {
-            if (e.getMessage().contains("Duplicate column name")) {
-                System.out.println("A coluna '" + nomeColuna + "' já existe.");
-            } else {
-                throw new RuntimeException("Erro ao adicionar coluna '" + nomeColuna + "': " + e.getMessage(), e);
-            }
-        }
-    }
-
-    public void adicionar(Cadastro cadastro) {
-        String sql = "INSERT INTO cadastro (nome, email, logradouro, cidade, estado, bairro, numero, cep, data_nasc, telefone, senha) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try (PreparedStatement stmt = connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, cadastro.getNome());
             stmt.setString(2, cadastro.getEmail());
-            stmt.setString(3, cadastro.getLogradouro());
-            stmt.setString(4, cadastro.getCidade());
-            stmt.setString(5, cadastro.getEstado());
-            stmt.setString(6, cadastro.getBairro());
-            stmt.setInt(7, cadastro.getNumero());
-            stmt.setString(8, cadastro.getCep());
-            stmt.setDate(9, new java.sql.Date(cadastro.getDataNasc().getTimeInMillis()));
-            stmt.setLong(10, cadastro.getTelefone());
-            stmt.setString(11, cadastro.getSenha());
+            stmt.setString(3, cadastro.getTelefone());
+            stmt.setDate(4, new java.sql.Date(cadastro.getDataNasc().getTimeInMillis()));
+            stmt.setString(5, cadastro.getSenha());
+            stmt.setBoolean(6, cadastro.isAdmin());
+            stmt.executeUpdate();
 
-            stmt.execute();
-            System.out.println("Cadastro adicionado com sucesso!");
-        } catch (SQLException e) {
-            throw new RuntimeException("Erro ao adicionar cadastro: " + e.getMessage(), e);
-        }
-    }
-
-    public void testarConexao() {
-        try {
-            if (connection != null && !connection.isClosed()) {
-                System.out.println("Conexão bem-sucedida!");
+            // Captura o ID gerado para usar na tabela de clientes ou administradores
+            ResultSet rs = stmt.getGeneratedKeys();
+            if (rs.next()) {
+                return rs.getInt(1); // Retorna o ID gerado
             } else {
-                System.out.println("Falha na conexão.");
+                throw new SQLException("Falha ao obter o ID gerado.");
             }
-        } catch (SQLException e) {
-            System.out.println("Erro ao testar conexão: " + e.getMessage());
         }
     }
+
+    public void adicionarAdministrador(int usuarioId, Cadastro cadastro) throws SQLException {
+        String sql = "INSERT INTO administradores (usuario_id) VALUES (?)";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, usuarioId);
+            stmt.executeUpdate();
+        }
+    }
+
+    public void adicionarCliente(int usuarioId, Cadastro cadastro) throws SQLException {
+        String sql = "INSERT INTO clientes (usuario_id, logradouro, numero, bairro, cidade, estado, cep) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, usuarioId);
+            stmt.setString(2, cadastro.getLogradouro());
+            stmt.setInt(3, cadastro.getNumero()); // Certifique-se de que o tipo de dado esteja correto
+            stmt.setString(4, cadastro.getBairro());
+            stmt.setString(5, cadastro.getCidade());
+            stmt.setString(6, cadastro.getEstado());
+            stmt.setString(7, cadastro.getCep());
+            stmt.executeUpdate();
+        }
+    }
+
+
+    public Cadastro buscarUsuarioPorEmail(String email) throws SQLException {
+        String sql = "SELECT * FROM Cadastro WHERE email = ?";
+        Cadastro cadastro = null;
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, email);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                cadastro = new Cadastro(
+                        rs.getString("nome"),
+                        rs.getString("email"),
+                        rs.getString("logradouro"),
+                        rs.getString("cidade"),
+                        rs.getString("estado"),
+                        rs.getString("bairro"),
+                        rs.getInt("numero"),
+                        rs.getString("cep"),
+                        null, // dataNasc será setada depois
+                        rs.getString("telefone"),
+                        rs.getString("senha"),
+                        rs.getBoolean("isAdmin")
+                );
+
+                Calendar dataNasc = Calendar.getInstance();
+                dataNasc.setTime(rs.getDate("data_Nasc"));
+                cadastro.setDataNasc(dataNasc);
+            }
+        }
+        return cadastro;
+    }
+
+    public void atualizarUsuario(Cadastro cadastro) throws SQLException {
+        String sql = "UPDATE Cadastro SET nome = ?, logradouro = ?, cidade = ?, estado = ?, bairro = ?, numero = ?, cep = ?, data_Nasc = ?, telefone = ?, senha = ?, isAdmin = ? WHERE email = ?";
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, cadastro.getNome());
+            stmt.setString(2, cadastro.getLogradouro());
+            stmt.setString(3, cadastro.getCidade());
+            stmt.setString(4, cadastro.getEstado());
+            stmt.setString(5, cadastro.getBairro());
+            stmt.setInt(6, cadastro.getNumero());
+            stmt.setString(7, cadastro.getCep());
+            stmt.setDate(8, new java.sql.Date(cadastro.getDataNasc().getTimeInMillis()));
+            stmt.setString(9, cadastro.getTelefone());
+            stmt.setString(10, cadastro.getSenha());
+            stmt.setBoolean(11, cadastro.isAdmin());
+            stmt.setString(12, cadastro.getEmail());
+
+            stmt.executeUpdate();
+        }
+    }
+
+    public void deletarUsuario(String email) throws SQLException {
+        String sql = "DELETE FROM Cadastro WHERE email = ?";
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, email);
+            stmt.executeUpdate();
+        }
+    }
+
+    public boolean validarUsuario(String email, String senha) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM usuarios WHERE email = ? AND senha = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, email);
+            stmt.setString(2, senha);
+            ResultSet rs = stmt.executeQuery();
+            return rs.next() && rs.getInt(1) > 0;
+        }
+    }
+
+    public boolean isAdmin(String email) throws SQLException {
+        String sql = "SELECT is_admin FROM usuarios WHERE email = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, email);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getBoolean("is_admin");
+            }
+            return false; // Usuário não encontrado
+        }
+    }
+
 }

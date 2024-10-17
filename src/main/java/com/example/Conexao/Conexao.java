@@ -16,7 +16,6 @@ public class Conexao {
         }
     }
 
-    // Método principal para testar a conexão
     public static void main(String[] args) {
         Conexao conexao = new Conexao();
         try (Connection conn = conexao.getConnection()) {

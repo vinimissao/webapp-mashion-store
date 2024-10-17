@@ -1,26 +1,42 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cadastro</title>
+    <title>Formulário de Cadastro</title>
 </head>
 <body>
 <h1>Formulário de Cadastro</h1>
-<form action="Cadastrar" method="post">
-    Nome: <input type="text" name="nome" required><br>
-    E-mail: <input type="email" name="email" required><br>
-    CEP: <input type="text" name="cep" required><br>
-    Logradouro: <input type="text" name="logradouro" readonly><br>
-    Cidade: <input type="text" name="cidade" readonly><br>
-    Estado: <input type="text" name="estado" readonly><br>
-    Bairro: <input type="text" name="bairro" readonly><br>
-    Número: <input type="text" name="numero" required><br>
-    Data de Nascimento: <input type="date" name="data_Nasc" required><br>
-    Telefone: <input type="text" name="telefone" required><br>
-    Senha: <input type="password" name="senha" required><br>
-    <input type="submit" value="Cadastrar">
+<form action="CadastroServlet" method="post">
+    <label for="nome">Nome:</label>
+    <input type="text" id="nome" name="nome" required><br>
+    <label for="email">E-mail:</label>
+    <input type="email" id="email" name="email" required><br>
+    <label for="cep">CEP:</label>
+    <input type="text" id="cep" name="cep" required><br>
+    <label for="numero">Número:</label>
+    <input type="text" id="numero" name="numero" required><br>
+    <label for="dataNascimento">Data de Nascimento:</label>
+    <input type="date" id="dataNascimento" name="dataNascimento" required><br>
+    <label for="telefone">Telefone:</label>
+    <input type="text" id="telefone" name="telefone" required><br>
+    <label for="senha">Senha:</label>
+    <input type="password" id="senha" name="senha" required><br>
+    <label for="logradouro">Logradouro:</label>
+    <input type="text" id="logradouro" name="logradouro" required><br>
+    <label for="cidade">Cidade:</label>
+    <input type="text" id="cidade" name="cidade" required><br>
+    <label for="estado">Estado:</label>
+    <input type="text" id="estado" name="estado" required><br>
+    <label for="bairro">Bairro:</label>
+    <input type="text" id="bairro" name="bairro" required><br>
+    <button type="submit">Cadastrar</button>
 </form>
 
+<c:if test="${not empty successMessage}">
+    <p style="color:green;">${successMessage}</p>
+</c:if>
+<c:if test="${not empty errorMessage}">
+    <p style="color:red;">${errorMessage}</p>
+</c:if>
 </body>
 </html>

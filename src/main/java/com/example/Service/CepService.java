@@ -17,7 +17,6 @@ public class CepService {
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod("GET");
 
-        // Lê a resposta da API
         BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
         StringBuilder response = new StringBuilder();
         String linha;
@@ -26,17 +25,14 @@ public class CepService {
         }
         reader.close();
 
-        // Parseia a resposta JSON
         JSONObject json = new JSONObject(response.toString());
 
-        // Extrai os campos necessários do JSON
         String logradouro = json.optString("logradouro", ""); // Usa optString para evitar erros caso o campo não exista
         String bairro = json.optString("bairro", "");
         String cidade = json.optString("localidade", "");
         String estado = json.optString("uf", "");
 
-        // Retorna um novo objeto Cadastro com os dados obtidos
-        Cadastro cadastro = new Cadastro(logradouro, bairro, cidade, estado, cep);
+        Cadastro cadastro = new Cadastro(logradouro, cidade, cidade, bairro, cep);
 
         return cadastro;
     }

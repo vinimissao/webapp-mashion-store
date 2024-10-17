@@ -12,12 +12,13 @@ public class Cadastro {
     private int numero;
     private String cep;
     private Calendar dataNasc;
-    private long telefone;
-    private String senha; // Alterado para String
+    private String telefone;
+    private String senha;
+    private boolean isAdmin;
 
     // Construtor completo com todos os campos
     public Cadastro(String nome, String email, String logradouro, String cidade, String estado,
-                    String bairro, int numero, String cep, Calendar dataNasc, long telefone, String senha) {
+                    String bairro, int numero, String cep, Calendar dataNasc, String telefone, String senha, boolean isAdmin) {
         this.nome = nome;
         this.email = email;
         this.logradouro = logradouro;
@@ -29,16 +30,17 @@ public class Cadastro {
         this.dataNasc = dataNasc;
         this.telefone = telefone;
         this.senha = senha;
+        this.isAdmin = isAdmin;
     }
 
-    // Construtor apenas para Endereço (usado no CepService)
-    public Cadastro(String logradouro, String cidade, String estado, String bairro, String cep) {
+    public Cadastro(String logradouro, String cidade , String estado, String bairro, String cep) {
         this.logradouro = logradouro;
+        this.bairro = bairro;
         this.cidade = cidade;
         this.estado = estado;
-        this.bairro = bairro;
         this.cep = cep;
     }
+
 
     // Getters e Setters
     public String getNome() {
@@ -113,11 +115,11 @@ public class Cadastro {
         this.dataNasc = dataNasc;
     }
 
-    public long getTelefone() {
+    public String getTelefone() {
         return telefone;
     }
 
-    public void setTelefone(long telefone) {
+    public void setTelefone(String telefone) {
         this.telefone = telefone;
     }
 
@@ -127,5 +129,13 @@ public class Cadastro {
 
     public void setSenha(String senha) {
         this.senha = senha;
+    }
+
+    public boolean isAdmin() {
+        return isAdmin;
+    }
+
+    public void setAdmin(boolean isAdmin) {
+        this.isAdmin = isAdmin;
     }
 }
