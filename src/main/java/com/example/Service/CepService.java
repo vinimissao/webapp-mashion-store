@@ -27,7 +27,7 @@ public class CepService {
 
         JSONObject json = new JSONObject(response.toString());
 
-        String logradouro = json.optString("logradouro", ""); // Usa optString para evitar erros caso o campo não exista
+        String logradouro = json.optString("logradouro", "");
         String bairro = json.optString("bairro", "");
         String cidade = json.optString("localidade", "");
         String estado = json.optString("uf", "");

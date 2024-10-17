@@ -21,11 +21,10 @@ public class LoginServlet extends HttpServlet {
             boolean isValidUser = cadastroDao.validarUsuario(email, senha);
 
             if (isValidUser) {
-                // Redirecionar com base no tipo de usuário
                 if (cadastroDao.isAdmin(email)) {
-                    response.sendRedirect("adminDashboard.jsp"); // Redirecionar para tela do administrador
+                    response.sendRedirect("adminDashboard.jsp");
                 } else {
-                    response.sendRedirect("clientDashboard.jsp"); // Redirecionar para tela do cliente
+                    response.sendRedirect("clientDashboard.jsp");
                 }
             } else {
                 request.setAttribute("errorMessage", "E-mail ou senha inválidos.");

@@ -29,7 +29,6 @@ public class CadastroDao {
             stmt.setBoolean(6, cadastro.isAdmin());
             stmt.executeUpdate();
 
-            // Captura o ID gerado para usar na tabela de clientes ou administradores
             ResultSet rs = stmt.getGeneratedKeys();
             if (rs.next()) {
                 return rs.getInt(1); // Retorna o ID gerado
@@ -52,7 +51,7 @@ public class CadastroDao {
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, usuarioId);
             stmt.setString(2, cadastro.getLogradouro());
-            stmt.setInt(3, cadastro.getNumero()); // Certifique-se de que o tipo de dado esteja correto
+            stmt.setInt(3, cadastro.getNumero());
             stmt.setString(4, cadastro.getBairro());
             stmt.setString(5, cadastro.getCidade());
             stmt.setString(6, cadastro.getEstado());
@@ -142,7 +141,7 @@ public class CadastroDao {
             if (rs.next()) {
                 return rs.getBoolean("is_admin");
             }
-            return false; // Usuário não encontrado
+            return false;
         }
     }
 

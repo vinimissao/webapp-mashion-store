@@ -8,7 +8,7 @@
 <body>
 <h1>Formulário de Cadastro</h1>
 <form action="Cadastrar" method="post">
-    <!-- Radio buttons para determinar o tipo de cadastro -->
+
     <label>
         <input type="radio" name="tipoCadastro" value="admin" <%= "admin".equals(request.getParameter("tipoCadastro")) ? "checked" : "" %>> Administrador
     </label>
@@ -26,7 +26,6 @@
     Telefone: <input type="text" name="telefone" required value="<%= request.getParameter("telefone") != null ? request.getParameter("telefone") : "" %>"><br>
     Senha: <input type="password" name="senha" required><br>
 
-    <!-- Campos que são exibidos apenas para Cliente -->
     <%
         String tipoCadastro = request.getParameter("tipoCadastro");
         if ("cliente".equals(tipoCadastro)) {
@@ -42,7 +41,7 @@
     <input type="submit" value="Cadastrar">
 </form>
 
-<%-- Mensagem de erro ou sucesso --%>
+
 <%
     String errorMessage = (String) request.getAttribute("errorMessage");
     if (errorMessage != null) {

@@ -27,7 +27,6 @@ public class CadastrarServlet extends HttpServlet {
         String telefoneStr = request.getParameter("telefone"); // Telefone como String
         String senha = request.getParameter("senha");
 
-        // Verificação de campos obrigatórios
         if (tipoCadastro.equals("admin") && isNullOrEmpty(nome)) {
             request.setAttribute("errorMessage", "O campo nome é obrigatório para Administradores.");
             request.getRequestDispatcher("cadastro.jsp").forward(request, response);
@@ -39,14 +38,13 @@ public class CadastrarServlet extends HttpServlet {
             return;
         }
 
-        // Verificação se número é numérico
         if (!numeroStr.matches("\\d+")) {
             request.setAttribute("errorMessage", "Número deve ser numérico.");
             request.getRequestDispatcher("cadastro.jsp").forward(request, response);
             return;
         }
 
-        // Verificação do CEP
+
         Cadastro enderecoData;
         try {
             enderecoData = CepService.buscarCep(cep);
@@ -81,16 +79,14 @@ public class CadastrarServlet extends HttpServlet {
             return;
         }
 
-        // Cria o objeto Cadastro
         Cadastro cadastro = new Cadastro(nome, email, enderecoData.getLogradouro(), enderecoData.getCidade(),
                 enderecoData.getEstado(), enderecoData.getBairro(), numero, cep,
-                dataNasc, telefoneStr, senha, tipoCadastro.equals("admin")); // Telefone como String
+                dataNasc, telefoneStr, senha, tipoCadastro.equals("admin"));
 
         try {
             CadastroDao cadastroDao = new CadastroDao();
-            int usuarioId = cadastroDao.adicionarUsuario(cadastro); // Captura o ID gerado
+            int usuarioId = cadastroDao.adicionarUsuario(cadastro);
 
-            // Verifica o tipo de cadastro e adiciona à tabela correspondente
             if (tipoCadastro.equals("admin")) {
                 cadastroDao.adicionarAdministrador(usuarioId, cadastro);
             } else {
