@@ -5,4 +5,3 @@ com\example\dao\CadastroDao.class
 com\example\Servlet\CadastrarServlet.class
 com\example\Service\CepService.class
 com\example\Servlet\LoginServlet.class
-com\example\dao\UsuarioDAO.class
