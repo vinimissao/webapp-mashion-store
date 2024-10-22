@@ -1,7 +1,9 @@
-com\example\Modelo\Usuario.class
+com\example\Modelo\Produto.class
 com\example\Modelo\Cadastro.class
 com\example\Conexao\Conexao.class
 com\example\dao\CadastroDao.class
 com\example\Servlet\CadastrarServlet.class
+com\example\dao\ProdutoDao.class
 com\example\Service\CepService.class
 com\example\Servlet\LoginServlet.class
+com\example\Servlet\ProdutoServlet.class
