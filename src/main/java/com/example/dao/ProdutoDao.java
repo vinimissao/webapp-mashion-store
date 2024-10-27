@@ -1,12 +1,10 @@
 package com.example.dao;
 import com.example.Conexao.Conexao;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import com.example.Modelo.Produto;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
