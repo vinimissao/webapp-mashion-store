@@ -10,7 +10,7 @@ public class Conexao {
         System.out.println("Conectando ao banco de dados...");
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
-            return DriverManager.getConnection("jdbc:mysql://localhost:3306/mashionstore", "root", "Coruja07");
+            return DriverManager.getConnection("jdbc:mysql://localhost:3306/mashionstore", "root", "1234");
         } catch (ClassNotFoundException e) {
             throw new SQLException(e);
         }

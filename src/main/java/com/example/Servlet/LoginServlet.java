@@ -1,37 +1,51 @@
 package com.example.Servlet;
 
-import com.example.dao.CadastroDao;
+import com.example.Modelo.Cadastro; // Importar seu modelo de Cadastro
+import com.example.dao.CadastroDao; // Importar seu DAO de Cadastro
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 import java.sql.SQLException;
-
 @WebServlet("/LoginServlet")
 public class LoginServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String email = request.getParameter("email");
         String senha = request.getParameter("senha");
 
-        try {
-            CadastroDao cadastroDao = new CadastroDao();
-            boolean isValidUser = cadastroDao.validarUsuario(email, senha);
+        CadastroDao cadastroDao;
+        Cadastro usuarioLogado;
 
-            if (isValidUser) {
-                if (cadastroDao.isAdmin(email)) {
-                    response.sendRedirect("adminDashboard.jsp");
-                } else {
-                    response.sendRedirect("clientDashboard.jsp");
-                }
-            } else {
-                request.setAttribute("errorMessage", "E-mail ou senha inválidos.");
-                request.getRequestDispatcher("login.jsp").forward(request, response);
-            }
+        try {
+            cadastroDao = new CadastroDao();
+            // Chama o método que valida o login e retorna um objeto Cadastro
+            usuarioLogado = cadastroDao.validarUsuario(email, senha);
         } catch (SQLException e) {
-            request.setAttribute("errorMessage", "Erro ao acessar o banco de dados: " + e.getMessage());
+            request.setAttribute("errorMessage", "Erro ao autenticar: " + e.getMessage());
+            request.getRequestDispatcher("login.jsp").forward(request, response);
+            return;
+        }
+
+        if (usuarioLogado != null) {
+            // Se o usuário for encontrado e as credenciais estiverem corretas
+            HttpSession session = request.getSession();
+            // Armazena o objeto do usuário na sessão
+            session.setAttribute("usuarioLogado", usuarioLogado);
+            // Define isAdmin com base no perfil
+            session.setAttribute("isAdmin", usuarioLogado.isAdmin());
+
+            // Redireciona para a página correta dependendo do tipo de usuário
+            if (usuarioLogado.isAdmin()) {
+                response.sendRedirect("adminDashboard.jsp"); // Para administradores
+            } else {
+                response.sendRedirect("clientDashboard.jsp"); // Para clientes
+            }
+        } else {
+            request.setAttribute("errorMessage", "Email ou senha inválidos.");
             request.getRequestDispatcher("login.jsp").forward(request, response);
         }
     }

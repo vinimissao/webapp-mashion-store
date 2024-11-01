@@ -14,11 +14,11 @@ body {
 
 .cadastro-container {
     background-color: white;
-    padding: 30px;
+    padding: 20px; /* Reduzido o padding do formulário */
     border-radius: 10px;
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
     text-align: center;
-    width: 400px;
+    width: 300px; /* Diminuí o tamanho do formulário */
 }
 
 .cadastro-container h2 {
@@ -28,50 +28,32 @@ body {
 
 .cadastro-container p {
     color: #666;
-    margin-bottom: 30px;
+    margin-bottom: 20px; /* Ajuste de margens */
 }
 
 .cadastro-container input, .cadastro-container select {
     width: 100%;
-    padding: 12px;
-    margin: 8px 0;
+    padding: 10px; /* Reduzido o padding dos inputs */
+    margin: 5px 0; /* Reduzido o espaço entre os campos */
     border: 1px solid #ccc;
     border-radius: 5px;
     font-size: 14px;
 }
 
-.password-container {
-    position: relative;
+
+.tipo-cadastro label {
+    margin-right: 10px; /* Espaço entre os checkboxes */
 }
 
-.password-container input {
-    width: calc(100% - 40px);
-}
 
-.password-container button {
-    position: absolute;
-    right: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 16px;
-    padding: 0 10px;
-}
-
-.sexo-container {
-    margin-top: 15px;
-    text-align: left;
-}
-
-.sexo-container label {
-    margin-right: 10px;
+.endereco-container .endereco-input {
+    width: 30%; /* Ajuste o tamanho dos campos de endereço */
+    padding: 5px; /* Reduz o padding para deixar os campos menores */
 }
 
 .cadastro-container button[type="submit"] {
     width: 100%;
-    padding: 12px;
+    padding: 10px; /* Reduzido o padding do botão */
     background-color: #3C0809;
     border: none;
     color: white;
@@ -94,6 +76,25 @@ body {
 span.psw {
     float: right;
     padding-top: 16px;
+}
+
+
+/* Adicionei algumas regras CSS diretamente para melhor visibilidade */
+.tipo-cadastro {
+    display: flex;
+    justify-content: space-between; /* Distribui os checkboxes */
+    margin-bottom: 15px; /* Espaço entre os checkboxes e os campos do formulário */
+}
+
+.endereco-container {
+    display: flex;
+    justify-content: space-between; /* Alinha os campos de endereço na mesma linha */
+    margin-bottom: 15px; /* Espaço abaixo do container de endereço */
+}
+
+.endereco-input {
+    width: 32%; /* Tamanho dos campos de endereço */
+    padding: 5px; /* Menor padding para deixar os campos mais delicados */
 }
 
 /* Change styles for span and cancel button on extra small screens */
