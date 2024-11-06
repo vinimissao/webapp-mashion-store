@@ -1,5 +1,8 @@
 package com.example.Modelo;
+
 import java.sql.Timestamp;
+import java.util.Base64;
+
 public class Produto {
     private int id;
     private String nome;
@@ -20,9 +23,7 @@ public class Produto {
         this.dataCadastro = dataCadastro;
     }
 
-    public Produto() {
-
-    }
+    public Produto() {}
 
     // Getters e setters
     public int getId() {
@@ -31,7 +32,6 @@ public class Produto {
 
     public void setId(int id) {
         this.id = id;
-
     }
 
     public String getNome() {
@@ -80,5 +80,13 @@ public class Produto {
 
     public void setDataCadastro(Timestamp dataCadastro) {
         this.dataCadastro = dataCadastro;
+    }
+
+    // Método para converter a imagem para Base64
+    public String getImagemBase64() {
+        if (this.imagem != null) {
+            return Base64.getEncoder().encodeToString(this.imagem);
+        }
+        return null;
     }
 }

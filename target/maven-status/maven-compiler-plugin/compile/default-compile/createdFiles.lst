@@ -1,4 +1,5 @@
 com\example\Modelo\ItensPedido.class
+com\example\Servlet\ImagemProdutoServlet.class
 com\example\dao\CadastroDao.class
 com\example\Modelo\Pedido.class
 com\example\Servlet\CadastrarServlet.class

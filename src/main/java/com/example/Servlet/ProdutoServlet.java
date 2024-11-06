@@ -107,49 +107,78 @@ public class ProdutoServlet extends HttpServlet {
         String precoStr = request.getParameter("preco");
         String estoqueStr = request.getParameter("estoque");
 
-        // Verificando se os parâmetros necessários estão preenchidos
+        // Log de valores recebidos
+        System.out.println("idStr: " + idStr);
+        System.out.println("nome: " + nome);
+        System.out.println("descricao: " + descricao);
+        System.out.println("precoStr: " + precoStr);
+        System.out.println("estoqueStr: " + estoqueStr);
+
+        // Verifique se todos os campos obrigatórios foram preenchidos
         if (idStr == null || nome == null || descricao == null || precoStr == null || estoqueStr == null ||
                 idStr.isEmpty() || nome.isEmpty() || descricao.isEmpty() || precoStr.isEmpty() || estoqueStr.isEmpty()) {
-            request.setAttribute("errorMessage", "Todos os campos devem ser preenchidos.");
-            request.getRequestDispatcher("adminDashboard.jsp").forward(request, response);
+            forwardWithError(request, response, "Todos os campos devem ser preenchidos.");
             return;
         }
 
-        // Converter o ID para inteiro
-        int id = Integer.parseInt(idStr);
+        try {
+            int id = Integer.parseInt(idStr);
+            precoStr = precoStr.replace(",", ".");
+            double preco = Double.parseDouble(precoStr);
+            int estoque = Integer.parseInt(estoqueStr);
+            Part imagemPart = request.getPart("imagem");
+            byte[] imagem = imagemPart.getSize() > 0 ? imagemPart.getInputStream().readAllBytes() : null;
 
-        // Substituindo a vírgula por ponto para o preço
-        precoStr = precoStr.replace(",", ".");
+            ProdutoDao produtoDao = new ProdutoDao();
+            Produto produto = produtoDao.buscarProdutoPorId(id);
 
-        // Verificando se o preço e estoque não são nulos
-        double preco = Double.parseDouble(precoStr);
-        int estoque = Integer.parseInt(estoqueStr);
-        Part imagemPart = request.getPart("imagem");
-        byte[] imagem = imagemPart.getSize() > 0 ? imagemPart.getInputStream().readAllBytes() : null;
+            // Verifique se o produto existe
+            if (produto == null) {
+                forwardWithError(request, response, "Produto não encontrado.");
+                return;
+            }
 
-        ProdutoDao produtoDao = new ProdutoDao();
-        Produto produto = produtoDao.buscarProdutoPorId(id);
-        produto.setNome(nome);
-        produto.setDescricao(descricao);
-        produto.setPreco(preco);
-        produto.setEstoque(estoque);
+            // Atualize o produto com os novos dados
+            produto.setNome(nome);
+            produto.setDescricao(descricao);
+            produto.setPreco(preco);
+            produto.setEstoque(estoque);
 
-        if (imagem != null) {
-            produto.setImagem(imagem);
+            if (imagem != null) {
+                produto.setImagem(imagem);
+            }
+
+            produtoDao.atualizarProduto(produto);
+
+            request.setAttribute("successMessage", "Produto atualizado com sucesso!");
+            listarProdutos(request, response);
+
+        } catch (NumberFormatException e) {
+            forwardWithError(request, response, "Erro ao converter valores numéricos. Verifique os campos de preço e estoque.");
+        } catch (IOException | ServletException e) {
+            forwardWithError(request, response, "Erro ao processar a imagem. Tente novamente.");
         }
 
-        produtoDao.atualizarProduto(produto);
+    }
 
-        request.setAttribute("successMessage", "Produto atualizado com sucesso!");
+    // Método auxiliar para lidar com o envio de mensagens de erro para a página JSP
+    private void forwardWithError(HttpServletRequest request, HttpServletResponse response, String errorMessage) throws ServletException, IOException {
+        request.setAttribute("errorMessage", errorMessage);
         request.getRequestDispatcher("adminDashboard.jsp").forward(request, response);
     }
 
 
-    private void excluirProduto(HttpServletRequest request, HttpServletResponse response) throws SQLException, IOException, ServletException {
-        int id = Integer.parseInt(request.getParameter("id"));
-        produtoDao.deletarProduto(id);
 
-        request.setAttribute("successMessage", "Produto excluído com sucesso!");
+    private void excluirProduto(HttpServletRequest request, HttpServletResponse response) throws SQLException, IOException, ServletException {
+        try {
+            int id = Integer.parseInt(request.getParameter("id"));
+            produtoDao.deletarProduto(id);
+
+            request.setAttribute("successMessage", "Produto excluído com sucesso!");
+        } catch (NumberFormatException e) {
+            request.setAttribute("errorMessage", "ID do produto inválido para exclusão.");
+        }
+
         listarProdutos(request, response);  // Redireciona para a listagem de produtos
     }
 

@@ -40,7 +40,7 @@ public class LoginServlet extends HttpServlet {
 
             // Redireciona para a página correta dependendo do tipo de usuário
             if (usuarioLogado.isAdmin()) {
-                response.sendRedirect("adminDashboard.jsp"); // Para administradores
+                response.sendRedirect("ProdutoServlet"); // Para administradores
             } else {
                 response.sendRedirect("clientDashboard.jsp"); // Para clientes
             }
