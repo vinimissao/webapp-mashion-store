@@ -1,7 +1,7 @@
 package com.example.Servlet;
 
-import com.example.Modelo.Cadastro; // Importar seu modelo de Cadastro
-import com.example.dao.CadastroDao; // Importar seu DAO de Cadastro
+import com.example.Modelo.Cadastro;
+import com.example.dao.CadastroDao;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 import java.sql.SQLException;
+
 @WebServlet("/LoginServlet")
 public class LoginServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -22,7 +23,6 @@ public class LoginServlet extends HttpServlet {
 
         try {
             cadastroDao = new CadastroDao();
-            // Chama o método que valida o login e retorna um objeto Cadastro
             usuarioLogado = cadastroDao.validarUsuario(email, senha);
         } catch (SQLException e) {
             request.setAttribute("errorMessage", "Erro ao autenticar: " + e.getMessage());
@@ -30,19 +30,16 @@ public class LoginServlet extends HttpServlet {
             return;
         }
 
+
         if (usuarioLogado != null) {
-            // Se o usuário for encontrado e as credenciais estiverem corretas
             HttpSession session = request.getSession();
-            // Armazena o objeto do usuário na sessão
             session.setAttribute("usuarioLogado", usuarioLogado);
-            // Define isAdmin com base no perfil
             session.setAttribute("isAdmin", usuarioLogado.isAdmin());
 
-            // Redireciona para a página correta dependendo do tipo de usuário
             if (usuarioLogado.isAdmin()) {
-                response.sendRedirect("ProdutoServlet"); // Para administradores
+                response.sendRedirect("ProdutoServlet");
             } else {
-                response.sendRedirect("clientDashboard.jsp"); // Para clientes
+                response.sendRedirect("clientDashboard.jsp");
             }
         } else {
             request.setAttribute("errorMessage", "Email ou senha inválidos.");

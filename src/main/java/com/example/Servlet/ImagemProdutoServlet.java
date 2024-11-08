@@ -34,16 +34,14 @@ public class ImagemProdutoServlet extends HttpServlet {
             if (produto != null && produto.getImagem() != null) {
                 byte[] imagem = produto.getImagem();
 
-                // Configura o tipo de conteúdo da resposta como imagem
                 response.setContentType("image/jpeg");
                 response.setContentLength(imagem.length);
 
-                // Envia os bytes da imagem na resposta
                 OutputStream os = response.getOutputStream();
                 os.write(imagem);
                 os.flush();
             } else {
-                response.sendError(HttpServletResponse.SC_NOT_FOUND); // Se a imagem não existir
+                response.sendError(HttpServletResponse.SC_NOT_FOUND);
             }
         } catch (SQLException e) {
             e.printStackTrace();

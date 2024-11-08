@@ -15,19 +15,22 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+
 @WebServlet("/Cadastrar")
 public class CadastrarServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String tipoCadastro = request.getParameter("tipoCadastro");
+
         String nome = request.getParameter("nome");
         String email = request.getParameter("email");
         String cep = request.getParameter("cep");
         String numeroStr = request.getParameter("numero");
         String dataNascStr = request.getParameter("data_Nasc");
-        String telefoneStr = request.getParameter("telefone"); // Telefone como String
+        String telefoneStr = request.getParameter("telefone");
         String senha = request.getParameter("senha");
+        String cpf = request.getParameter("cpf");
 
-        // Validações
+
         if (isNullOrEmpty(nome) || isNullOrEmpty(email) || isNullOrEmpty(senha)) {
             request.setAttribute("errorMessage", "Nome, E-mail e Senha são obrigatórios.");
             request.getRequestDispatcher("cadastro.jsp").forward(request, response);
@@ -40,7 +43,7 @@ public class CadastrarServlet extends HttpServlet {
             return;
         }
 
-        // Validação do CEP
+
         if (cep == null || !cep.matches("\\d{8}")) {
             request.setAttribute("errorMessage", "CEP deve ter 8 dígitos numéricos.");
             request.getRequestDispatcher("cadastro.jsp").forward(request, response);
@@ -61,7 +64,6 @@ public class CadastrarServlet extends HttpServlet {
             return;
         }
 
-        // Conversão de dados
         int numero;
         Calendar dataNasc;
         try {
@@ -69,7 +71,6 @@ public class CadastrarServlet extends HttpServlet {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
             Date date = sdf.parse(dataNascStr);
 
-            // Verifica se a data de nascimento é válida
             if (date.after(new Date())) {
                 request.setAttribute("errorMessage", "Data de nascimento não pode ser uma data futura.");
                 request.getRequestDispatcher("cadastro.jsp").forward(request, response);
@@ -84,7 +85,11 @@ public class CadastrarServlet extends HttpServlet {
             return;
         }
 
-        Cadastro cadastro = new Cadastro(nome, email, enderecoData.getLogradouro(), enderecoData.getCidade(),
+
+        cpf = formatarCpf(cpf);
+        telefoneStr = formatarTelefone(telefoneStr);
+
+        Cadastro cadastro = new Cadastro(cpf, nome, email, enderecoData.getLogradouro(), enderecoData.getCidade(),
                 enderecoData.getEstado(), enderecoData.getBairro(), numero, cep,
                 dataNasc, telefoneStr, senha, tipoCadastro.equals("admin"));
 
@@ -102,5 +107,21 @@ public class CadastrarServlet extends HttpServlet {
 
     private boolean isNullOrEmpty(String str) {
         return str == null || str.trim().isEmpty();
+    }
+
+    private String formatarCpf(String cpf) {
+        cpf = cpf.replaceAll("[^0-9]", "");
+        if (cpf.length() == 11) {
+            return cpf.substring(0, 3) + "." + cpf.substring(3, 6) + "." + cpf.substring(6, 9) + "-" + cpf.substring(9, 11);
+        }
+        return cpf;
+    }
+
+    private String formatarTelefone(String telefone) {
+        telefone = telefone.replaceAll("[^0-9]", "");
+        if (telefone.length() == 11) {
+            return "(" + telefone.substring(0, 2) + ") " + telefone.substring(2, 7) + "-" + telefone.substring(7, 11);
+        }
+        return telefone;
     }
 }

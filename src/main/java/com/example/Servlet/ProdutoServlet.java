@@ -14,8 +14,8 @@ import java.util.List;
 
 @WebServlet("/ProdutoServlet")
 @MultipartConfig(
-        maxFileSize = 1024 * 1024 * 2,      // 2 MB para arquivos de imagem
-        maxRequestSize = 1024 * 1024 * 10   // 10 MB para a requisição inteira
+        maxFileSize = 1024 * 1024 * 2,
+        maxRequestSize = 1024 * 1024 * 10
 )
 public class ProdutoServlet extends HttpServlet {
 
@@ -35,7 +35,7 @@ public class ProdutoServlet extends HttpServlet {
         try {
             listarProdutos(request, response);
         } catch (SQLException e) {
-            throw new ServletException("Erro ao listar produtos", e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -62,7 +62,7 @@ public class ProdutoServlet extends HttpServlet {
                     break;
             }
         } catch (SQLException e) {
-            throw new ServletException(e);
+            throw new ServletException("Erro ao processar a solicitação", e);
         }
     }
 
@@ -77,68 +77,56 @@ public class ProdutoServlet extends HttpServlet {
 
         String nome = request.getParameter("nome");
         String descricao = request.getParameter("descricao");
-        String precoStr = request.getParameter("preco");
+        String precoStr = request.getParameter("preco").replace(",", ".");
         String estoqueStr = request.getParameter("estoque");
         Part imagemPart = request.getPart("imagem");
 
-        if (nome == null || nome.isEmpty() || descricao == null || descricao.isEmpty() ||
-                precoStr == null || precoStr.isEmpty() || estoqueStr == null || estoqueStr.isEmpty() ||
-                imagemPart == null || imagemPart.getSize() == 0) {
-            request.setAttribute("errorMessage", "Preencha todos os campos obrigatórios.");
-            listarProdutos(request, response);  // Redireciona para a listagem de produtos
+        if (nome.isEmpty() || descricao.isEmpty() || precoStr.isEmpty() || estoqueStr.isEmpty() || imagemPart == null || imagemPart.getSize() == 0) {
+            forwardWithError(request, response, "Preencha todos os campos obrigatórios.");
             return;
         }
 
-        double preco = Double.parseDouble(precoStr);
-        int estoque = Integer.parseInt(estoqueStr);
-        byte[] imagem = imagemPart.getInputStream().readAllBytes();
+        try {
+            double preco = Double.parseDouble(precoStr);
+            int estoque = Integer.parseInt(estoqueStr);
+            byte[] imagem = imagemPart.getInputStream().readAllBytes();
 
-        Produto produto = new Produto(0, nome, descricao, preco, estoque, imagem, new Timestamp(System.currentTimeMillis()));
-        produtoDao.adicionarProduto(produto);
+            Produto produto = new Produto(0, nome, descricao, preco, estoque, imagem, new Timestamp(System.currentTimeMillis()));
+            produtoDao.adicionarProduto(produto);
 
-        request.setAttribute("successMessage", "Produto cadastrado com sucesso!");
-        listarProdutos(request, response);  // Redireciona para a listagem de produtos
+            request.setAttribute("successMessage", "Produto cadastrado com sucesso!");
+            listarProdutos(request, response);
+
+        } catch (NumberFormatException e) {
+            forwardWithError(request, response, "Erro ao converter valores numéricos.");
+        }
     }
 
     private void alterarProduto(HttpServletRequest request, HttpServletResponse response) throws SQLException, IOException, ServletException {
         String idStr = request.getParameter("id");
         String nome = request.getParameter("nome");
         String descricao = request.getParameter("descricao");
-        String precoStr = request.getParameter("preco");
+        String precoStr = request.getParameter("preco").replace(",", ".");
         String estoqueStr = request.getParameter("estoque");
 
-        // Log de valores recebidos
-        System.out.println("idStr: " + idStr);
-        System.out.println("nome: " + nome);
-        System.out.println("descricao: " + descricao);
-        System.out.println("precoStr: " + precoStr);
-        System.out.println("estoqueStr: " + estoqueStr);
-
-        // Verifique se todos os campos obrigatórios foram preenchidos
-        if (idStr == null || nome == null || descricao == null || precoStr == null || estoqueStr == null ||
-                idStr.isEmpty() || nome.isEmpty() || descricao.isEmpty() || precoStr.isEmpty() || estoqueStr.isEmpty()) {
+        if (idStr.isEmpty() || nome.isEmpty() || descricao.isEmpty() || precoStr.isEmpty() || estoqueStr.isEmpty()) {
             forwardWithError(request, response, "Todos os campos devem ser preenchidos.");
             return;
         }
 
         try {
             int id = Integer.parseInt(idStr);
-            precoStr = precoStr.replace(",", ".");
             double preco = Double.parseDouble(precoStr);
             int estoque = Integer.parseInt(estoqueStr);
             Part imagemPart = request.getPart("imagem");
             byte[] imagem = imagemPart.getSize() > 0 ? imagemPart.getInputStream().readAllBytes() : null;
 
-            ProdutoDao produtoDao = new ProdutoDao();
             Produto produto = produtoDao.buscarProdutoPorId(id);
-
-            // Verifique se o produto existe
             if (produto == null) {
                 forwardWithError(request, response, "Produto não encontrado.");
                 return;
             }
 
-            // Atualize o produto com os novos dados
             produto.setNome(nome);
             produto.setDescricao(descricao);
             produto.setPreco(preco);
@@ -149,25 +137,13 @@ public class ProdutoServlet extends HttpServlet {
             }
 
             produtoDao.atualizarProduto(produto);
-
             request.setAttribute("successMessage", "Produto atualizado com sucesso!");
             listarProdutos(request, response);
 
         } catch (NumberFormatException e) {
-            forwardWithError(request, response, "Erro ao converter valores numéricos. Verifique os campos de preço e estoque.");
-        } catch (IOException | ServletException e) {
-            forwardWithError(request, response, "Erro ao processar a imagem. Tente novamente.");
+            forwardWithError(request, response, "Erro ao converter valores numéricos.");
         }
-
     }
-
-    // Método auxiliar para lidar com o envio de mensagens de erro para a página JSP
-    private void forwardWithError(HttpServletRequest request, HttpServletResponse response, String errorMessage) throws ServletException, IOException {
-        request.setAttribute("errorMessage", errorMessage);
-        request.getRequestDispatcher("adminDashboard.jsp").forward(request, response);
-    }
-
-
 
     private void excluirProduto(HttpServletRequest request, HttpServletResponse response) throws SQLException, IOException, ServletException {
         try {
@@ -176,10 +152,9 @@ public class ProdutoServlet extends HttpServlet {
 
             request.setAttribute("successMessage", "Produto excluído com sucesso!");
         } catch (NumberFormatException e) {
-            request.setAttribute("errorMessage", "ID do produto inválido para exclusão.");
+            forwardWithError(request, response, "ID do produto inválido para exclusão.");
         }
-
-        listarProdutos(request, response);  // Redireciona para a listagem de produtos
+        listarProdutos(request, response);
     }
 
     private void consultarProduto(HttpServletRequest request, HttpServletResponse response) throws SQLException, IOException, ServletException {
@@ -190,14 +165,18 @@ public class ProdutoServlet extends HttpServlet {
             request.setAttribute("produto", produto);
             request.getRequestDispatcher("produtoDetalhes.jsp").forward(request, response);
         } else {
-            request.setAttribute("errorMessage", "Produto não encontrado.");
-            listarProdutos(request, response);  // Redireciona para a listagem de produtos
+            forwardWithError(request, response, "Produto não encontrado.");
         }
     }
 
     private void listarProdutos(HttpServletRequest request, HttpServletResponse response) throws SQLException, IOException, ServletException {
         List<Produto> produtos = produtoDao.listarProdutos();
         request.setAttribute("produtos", produtos);
+        request.getRequestDispatcher("adminDashboard.jsp").forward(request, response);
+    }
+
+    private void forwardWithError(HttpServletRequest request, HttpServletResponse response, String errorMessage) throws ServletException, IOException {
+        request.setAttribute("errorMessage", errorMessage);
         request.getRequestDispatcher("adminDashboard.jsp").forward(request, response);
     }
 }

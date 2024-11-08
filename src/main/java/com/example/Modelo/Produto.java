@@ -1,7 +1,9 @@
 package com.example.Modelo;
 
 import java.sql.Timestamp;
+import java.text.NumberFormat;
 import java.util.Base64;
+import java.util.Locale;
 
 public class Produto {
     private int id;
@@ -12,7 +14,6 @@ public class Produto {
     private byte[] imagem;
     private Timestamp dataCadastro;
 
-    // Construtor que aceita todos os parâmetros
     public Produto(int id, String nome, String descricao, double preco, int estoque, byte[] imagem, Timestamp dataCadastro) {
         this.id = id;
         this.nome = nome;
@@ -25,7 +26,7 @@ public class Produto {
 
     public Produto() {}
 
-    // Getters e setters
+
     public int getId() {
         return id;
     }
@@ -82,11 +83,16 @@ public class Produto {
         this.dataCadastro = dataCadastro;
     }
 
-    // Método para converter a imagem para Base64
     public String getImagemBase64() {
         if (this.imagem != null) {
             return Base64.getEncoder().encodeToString(this.imagem);
         }
         return null;
+    }
+
+
+    public String getPrecoFormatado() {
+        NumberFormat formatador = NumberFormat.getCurrencyInstance(new Locale("pt", "BR"));
+        return formatador.format(preco);
     }
 }

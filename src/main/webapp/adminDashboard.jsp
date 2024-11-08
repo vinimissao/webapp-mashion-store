@@ -1,4 +1,5 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="com.example.Modelo.Produto" %>
 <%@ page import="java.util.List" %>
@@ -54,7 +55,9 @@
                 <td>${produto.id}</td>
                 <td>${produto.nome}</td>
                 <td>${produto.descricao}</td>
-                <td>${produto.preco}</td>
+                <td>
+                    <fmt:formatNumber value="${produto.preco}" type="currency" currencySymbol="R$" minFractionDigits="2" />
+                </td>
                 <td>${produto.estoque}</td>
                 <td>
                     <c:if test="${produto.imagem != null}">
@@ -64,7 +67,6 @@
                 <td>
                     <form action="ProdutoServlet" method="post" enctype="multipart/form-data">
                         <input type="hidden" name="action" value="alterar">
-                        <label>Id:</label>
                         <input type="hidden" name="id" value="${produto.id}" required><br>
                         <label>Nome:</label>
                         <input type="text" name="nome" value="${produto.nome}" required><br>

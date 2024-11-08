@@ -17,7 +17,6 @@ public class CepService {
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod("GET");
 
-        // Verifica o código de resposta HTTP
         if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) {
             throw new IOException("Erro ao buscar o CEP: " + conn.getResponseMessage());
         }
@@ -32,9 +31,9 @@ public class CepService {
 
         JSONObject json = new JSONObject(response.toString());
 
-        // Verifica se houve erro na resposta
+
         if (json.has("erro")) {
-            return null; // Retorna null se o CEP não for encontrado
+            return null;
         }
 
         String logradouro = json.optString("logradouro", "");
@@ -42,7 +41,6 @@ public class CepService {
         String cidade = json.optString("localidade", "");
         String estado = json.optString("uf", "");
 
-        // Cria o objeto Cadastro com os dados corretos
         Cadastro cadastro = new Cadastro(logradouro, cidade, estado, bairro, cep);
 
         return cadastro;

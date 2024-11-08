@@ -3,6 +3,7 @@ package com.example.Modelo;
 import java.util.Calendar;
 
 public class Cadastro {
+    private String cpf;
     private String nome;
     private String email;
     private String logradouro;
@@ -16,9 +17,9 @@ public class Cadastro {
     private String senha;
     private boolean isAdmin;
 
-    // Construtor completo com todos os campos
-    public Cadastro(String nome, String email, String logradouro, String cidade, String estado,
+    public Cadastro(String cpf, String nome, String email, String logradouro, String cidade, String estado,
                     String bairro, int numero, String cep, Calendar dataNasc, String telefone, String senha, boolean isAdmin) {
+        this.cpf = cpf;              // Inicializa o CPF
         this.nome = nome;
         this.email = email;
         this.logradouro = logradouro;
@@ -41,8 +42,16 @@ public class Cadastro {
         this.cep = cep;
     }
 
-
     // Getters e Setters
+
+    public String getCpf() {
+        return cpf;
+    }
+
+    public void setCpf(String cpf) {
+        this.cpf = cpf;
+    }
+
     public String getNome() {
         return nome;
     }

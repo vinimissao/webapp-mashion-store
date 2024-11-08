@@ -17,31 +17,50 @@ public class CadastroDao {
         this.connection = cf.getConnection();
     }
 
-    public int adicionarUsuario(Cadastro cadastro) throws SQLException {
-        String sql = "INSERT INTO usuarios (nome, email, logradouro, cidade, estado, bairro, numero, cep, telefone, data_nascimento, senha, is_admin) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    public String adicionarUsuario(Cadastro cadastro) throws SQLException {
+        // SQL para inserir na tabela usuarios
+        String sqlUsuario = "INSERT INTO usuarios (cpf, nome, email, logradouro, cidade, estado, bairro, numero, cep, telefone, data_nasc, senha, is_admin) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-        try (PreparedStatement stmt = connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
-            stmt.setString(1, cadastro.getNome());
-            stmt.setString(2, cadastro.getEmail());
-            stmt.setString(3, cadastro.getLogradouro());
-            stmt.setString(4, cadastro.getCidade());
-            stmt.setString(5, cadastro.getEstado());
-            stmt.setString(6, cadastro.getBairro());
-            stmt.setInt(7, cadastro.getNumero());
-            stmt.setString(8, cadastro.getCep());
-            stmt.setString(9, cadastro.getTelefone());
-            stmt.setDate(10, new java.sql.Date(cadastro.getDataNasc().getTimeInMillis()));
-            stmt.setString(11, cadastro.getSenha());
-            stmt.setBoolean(12, cadastro.isAdmin());
+        // SQL para inserir na tabela clientes (caso não seja admin)
+        String sqlCliente = "INSERT INTO clientes (usuario_id) VALUES (?)";
 
-            stmt.executeUpdate();
+        // SQL para inserir na tabela administradores (caso seja admin)
+        String sqlAdministrador = "INSERT INTO administradores (usuario_id) VALUES (?)";
 
-            ResultSet rs = stmt.getGeneratedKeys();
-            if (rs.next()) {
-                return rs.getInt(1); // Retorna o ID gerado
+        try (PreparedStatement stmtUsuario = connection.prepareStatement(sqlUsuario, PreparedStatement.RETURN_GENERATED_KEYS)) {
+            // Inserir dados na tabela usuarios
+            stmtUsuario.setString(1, cadastro.getCpf());
+            stmtUsuario.setString(2, cadastro.getNome());
+            stmtUsuario.setString(3, cadastro.getEmail());
+            stmtUsuario.setString(4, cadastro.getLogradouro());
+            stmtUsuario.setString(5, cadastro.getCidade());
+            stmtUsuario.setString(6, cadastro.getEstado());
+            stmtUsuario.setString(7, cadastro.getBairro());
+            stmtUsuario.setInt(8, cadastro.getNumero());
+            stmtUsuario.setString(9, cadastro.getCep());
+            stmtUsuario.setString(10, cadastro.getTelefone());
+            stmtUsuario.setDate(11, new java.sql.Date(cadastro.getDataNasc().getTimeInMillis()));
+            stmtUsuario.setString(12, cadastro.getSenha());
+            stmtUsuario.setBoolean(13, cadastro.isAdmin());
+            stmtUsuario.executeUpdate();
+
+            String cpfInserido = cadastro.getCpf();
+
+            if (cadastro.isAdmin()) {
+                try (PreparedStatement stmtAdmin = connection.prepareStatement(sqlAdministrador)) {
+                    stmtAdmin.setString(1, cpfInserido);
+                    stmtAdmin.executeUpdate();
+                }
             } else {
-                throw new SQLException("Falha ao obter o ID gerado.");
+                try (PreparedStatement stmtCli = connection.prepareStatement(sqlCliente)) {
+                    stmtCli.setString(1, cpfInserido);
+                    stmtCli.executeUpdate();
+                }
             }
+
+            return cpfInserido;
+        } catch (SQLException e) {
+            throw new SQLException("Erro ao inserir o usuário: " + e.getMessage(), e);
         }
     }
 
@@ -55,6 +74,7 @@ public class CadastroDao {
 
             if (rs.next()) {
                 cadastro = new Cadastro(
+                        rs.getString("cpf"),
                         rs.getString("nome"),
                         rs.getString("email"),
                         rs.getString("logradouro"),
@@ -63,22 +83,22 @@ public class CadastroDao {
                         rs.getString("bairro"),
                         rs.getInt("numero"),
                         rs.getString("cep"),
-                        null, // dataNasc será setada depois
+                        null,
                         rs.getString("telefone"),
                         rs.getString("senha"),
                         rs.getBoolean("is_admin")
                 );
 
                 Calendar dataNasc = Calendar.getInstance();
-                dataNasc.setTime(rs.getDate("data_nascimento"));
+                dataNasc.setTime(rs.getDate("data_nasc"));
                 cadastro.setDataNasc(dataNasc);
             }
         }
-        return cadastro; // Retorna o objeto Cadastro ou null se não encontrar
+        return cadastro;
     }
 
     public void atualizarUsuario(Cadastro cadastro) throws SQLException {
-        String sql = "UPDATE usuarios SET nome = ?, logradouro = ?, cidade = ?, estado = ?, bairro = ?, numero = ?, cep = ?, data_nascimento = ?, telefone = ?, senha = ?, is_admin = ? WHERE email = ?";
+        String sql = "UPDATE usuarios SET nome = ?, logradouro = ?, cidade = ?, estado = ?, bairro = ?, numero = ?, cep = ?, data_nasc = ?, telefone = ?, senha = ?, is_admin = ? WHERE email = ?";
 
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, cadastro.getNome());
@@ -97,6 +117,7 @@ public class CadastroDao {
             stmt.executeUpdate();
         }
     }
+
 
     public void deletarUsuario(String email) throws SQLException {
         String sql = "DELETE FROM usuarios WHERE email = ?";
@@ -118,6 +139,7 @@ public class CadastroDao {
 
             if (rs.next()) {
                 cadastro = new Cadastro(
+                        rs.getString("cpf"),  // Adicionando CPF
                         rs.getString("nome"),
                         rs.getString("email"),
                         rs.getString("logradouro"),
@@ -133,11 +155,11 @@ public class CadastroDao {
                 );
 
                 Calendar dataNasc = Calendar.getInstance();
-                dataNasc.setTime(rs.getDate("data_nascimento"));
+                dataNasc.setTime(rs.getDate("data_nasc"));
                 cadastro.setDataNasc(dataNasc);
             }
         }
-        return cadastro; // Retorna o objeto Cadastro ou null
+        return cadastro;
     }
 
     public boolean isAdmin(String email) throws SQLException {

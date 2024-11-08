@@ -19,7 +19,6 @@ public class ProdutoDao {
         this.connection = cf.getConnection();
     }
 
-    // Método para adicionar um novo produto
     public void adicionarProduto(Produto produto) throws SQLException {
         String sql = "INSERT INTO produtos (nome, descricao, preco, estoque, imagem, data_cadastro) VALUES (?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
@@ -33,7 +32,6 @@ public class ProdutoDao {
         }
     }
 
-    // Método para atualizar um produto existente
     public void atualizarProduto(Produto produto) throws SQLException {
         String sql = "UPDATE produtos SET nome = ?, descricao = ?, preco = ?, estoque = ?, imagem = ? WHERE id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
@@ -47,7 +45,6 @@ public class ProdutoDao {
         }
     }
 
-    // Método para deletar um produto pelo ID
     public void deletarProduto(int id) throws SQLException {
         String sql = "DELETE FROM produtos WHERE id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
@@ -56,7 +53,7 @@ public class ProdutoDao {
         }
     }
 
-    // Método para buscar um produto pelo ID
+
     public Produto buscarProdutoPorId(int id) throws SQLException {
         String sql = "SELECT * FROM produtos WHERE id = ?";
         Produto produto = null;
@@ -71,7 +68,6 @@ public class ProdutoDao {
         return produto;
     }
 
-    // Método para listar todos os produtos
     public List<Produto> listarProdutos() throws SQLException {
         String sql = "SELECT * FROM produtos";
         List<Produto> produtos = new ArrayList<>();
@@ -84,7 +80,6 @@ public class ProdutoDao {
         return produtos;
     }
 
-    // Método auxiliar para mapear o ResultSet para o objeto Produto
     private Produto mapearProduto(ResultSet rs) throws SQLException {
         Produto produto = new Produto();
         produto.setId(rs.getInt("id"));
