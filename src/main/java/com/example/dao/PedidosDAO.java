@@ -11,12 +11,11 @@ import com.example.Modelo.Pedido;
 public class PedidosDAO {
     private Connection connection;
 
-    
     public PedidosDAO(Connection connection) {
         this.connection = connection;
     }
 
-   
+
     public boolean salvar(Pedido pedido) {
         String sql = "INSERT INTO pedidos (cliente_id, data_pedido, total, status_pedido) VALUES (?, ?, ?, ?)";
         try (PreparedStatement stmt = connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
@@ -26,7 +25,6 @@ public class PedidosDAO {
             stmt.setString(4, pedido.getStatus());
             stmt.executeUpdate();
 
-        
             ResultSet generatedKeys = stmt.getGeneratedKeys();
             if (generatedKeys.next()) {
                 pedido.setId(generatedKeys.getInt(1));
@@ -38,7 +36,6 @@ public class PedidosDAO {
         }
     }
 
-   
     public boolean atualizar(Pedido pedido) {
         String sql = "UPDATE pedidos SET cliente_id = ?, data_pedido = ?, total = ?, status_pedido = ? WHERE id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
@@ -55,7 +52,6 @@ public class PedidosDAO {
         }
     }
 
-    
     public Pedido buscarPedido(int id) {
         String sql = "SELECT * FROM pedidos WHERE id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
@@ -63,12 +59,11 @@ public class PedidosDAO {
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
                 return new Pedido(
-                    rs.getInt("id"),
-                    rs.getInt("cliente_id"),
-                    rs.getTimestamp("data_pedido"),
-                    rs.getBigDecimal("total"),
-                    rs.getString("status_pedido")
-                );
+                        rs.getInt("id"),
+                        rs.getInt("cliente_id"),
+                        rs.getTimestamp("data_pedido"),
+                        rs.getBigDecimal("total"),
+                        rs.getString("status_pedido"));
             }
         } catch (SQLException e) {
             System.out.println("Erro ao buscar o pedido: " + e.getMessage());
@@ -76,20 +71,18 @@ public class PedidosDAO {
         return null;
     }
 
-  
     public List<Pedido> listarTodos() {
         List<Pedido> pedidos = new ArrayList<>();
         String sql = "SELECT * FROM pedidos";
         try (PreparedStatement stmt = connection.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
+                ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
                 Pedido pedido = new Pedido(
-                    rs.getInt("id"),
-                    rs.getInt("cliente_id"),
-                    rs.getTimestamp("data_pedido"),
-                    rs.getBigDecimal("total"),
-                    rs.getString("status_pedido")
-                );
+                        rs.getInt("id"),
+                        rs.getInt("cliente_id"),
+                        rs.getTimestamp("data_pedido"),
+                        rs.getBigDecimal("total"),
+                        rs.getString("status_pedido"));
                 pedidos.add(pedido);
             }
         } catch (SQLException e) {
@@ -98,7 +91,6 @@ public class PedidosDAO {
         return pedidos;
     }
 
-  
     public boolean deletar(int id) {
         String sql = "DELETE FROM pedidos WHERE id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {

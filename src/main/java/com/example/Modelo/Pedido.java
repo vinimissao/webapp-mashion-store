@@ -28,6 +28,10 @@ public class Pedido {
         this.status = status;
     }
 
+    public Pedido() {
+        //TODO Auto-generated constructor stub
+    }
+
     public int getId() {
         return id;
     }

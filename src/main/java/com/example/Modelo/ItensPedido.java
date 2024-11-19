@@ -17,6 +17,10 @@ public class ItensPedido {
         this.preco = preco;
     }
 
+    public ItensPedido(int pedidoId2, int produtoId2, int quantidade2, BigDecimal preco2) {
+        //TODO Auto-generated constructor stub
+    }
+
     public int getId() {
         return id;
     }
