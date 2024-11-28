@@ -3,7 +3,9 @@ com\example\Servlet\ImagemProdutoServlet.class
 com\example\dao\CadastroDao.class
 com\example\Modelo\Pedido.class
 com\example\Servlet\CadastrarServlet.class
+com\example\Servlet\PedidoServlet.class
 com\example\Modelo\Produto.class
+com\example\Servlet\ItensPedidoServlet.class
 com\example\Modelo\Cadastro.class
 com\example\Conexao\Conexao.class
 com\example\dao\ProdutoDao.class

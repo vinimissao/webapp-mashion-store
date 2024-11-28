@@ -4,6 +4,7 @@ C:\Users\samue\OneDrive\Área de Trabalho\GITHUB\webapp-mashion-store\src\main\j
 C:\Users\samue\OneDrive\Área de Trabalho\GITHUB\webapp-mashion-store\src\main\java\com\example\Servlet\CadastrarServlet.java
 C:\Users\samue\OneDrive\Área de Trabalho\GITHUB\webapp-mashion-store\src\main\java\com\example\Service\CepService.java
 C:\Users\samue\OneDrive\Área de Trabalho\GITHUB\webapp-mashion-store\src\main\java\com\example\dao\CadastroDao.java
+C:\Users\samue\OneDrive\Área de Trabalho\GITHUB\webapp-mashion-store\src\main\java\com\example\Servlet\ItensPedidoServlet.java
 C:\Users\samue\OneDrive\Área de Trabalho\GITHUB\webapp-mashion-store\src\main\java\com\example\dao\PedidosDAO.java
 C:\Users\samue\OneDrive\Área de Trabalho\GITHUB\webapp-mashion-store\src\main\java\com\example\Modelo\ItensPedido.java
 C:\Users\samue\OneDrive\Área de Trabalho\GITHUB\webapp-mashion-store\src\main\java\com\example\dao\ProdutoDao.java
@@ -12,3 +13,4 @@ C:\Users\samue\OneDrive\Área de Trabalho\GITHUB\webapp-mashion-store\src\main\j
 C:\Users\samue\OneDrive\Área de Trabalho\GITHUB\webapp-mashion-store\src\main\java\com\example\Modelo\Pedido.java
 C:\Users\samue\OneDrive\Área de Trabalho\GITHUB\webapp-mashion-store\src\main\java\com\example\Modelo\Cadastro.java
 C:\Users\samue\OneDrive\Área de Trabalho\GITHUB\webapp-mashion-store\src\main\java\com\example\Servlet\LoginServlet.java
+C:\Users\samue\OneDrive\Área de Trabalho\GITHUB\webapp-mashion-store\src\main\java\com\example\Servlet\PedidoServlet.java
