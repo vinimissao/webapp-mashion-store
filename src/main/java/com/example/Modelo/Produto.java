@@ -1,31 +1,30 @@
 package com.example.Modelo;
 
+import java.math.BigDecimal;
 import java.sql.Timestamp;
-import java.text.NumberFormat;
-import java.util.Base64;
-import java.util.Locale;
 
 public class Produto {
     private int id;
     private String nome;
     private String descricao;
-    private double preco;
+    private BigDecimal preco;
     private int estoque;
     private byte[] imagem;
-    private Timestamp dataCadastro;
+    private Timestamp dataCriacao;
 
-    public Produto(int id, String nome, String descricao, double preco, int estoque, byte[] imagem, Timestamp dataCadastro) {
+    public Produto(int id, String nome, String descricao, BigDecimal preco, int estoque) {
         this.id = id;
         this.nome = nome;
         this.descricao = descricao;
         this.preco = preco;
         this.estoque = estoque;
-        this.imagem = imagem;
-        this.dataCadastro = dataCadastro;
     }
 
-    public Produto() {}
-
+    public Produto(int id, String nome, String descricao, BigDecimal preco, int estoque, byte[] imagem, Timestamp dataCriacao) {
+        this(id, nome, descricao, preco, estoque);
+        this.imagem = imagem;
+        this.dataCriacao = dataCriacao;
+    }
 
     public int getId() {
         return id;
@@ -51,11 +50,11 @@ public class Produto {
         this.descricao = descricao;
     }
 
-    public double getPreco() {
+    public BigDecimal getPreco() {
         return preco;
     }
 
-    public void setPreco(double preco) {
+    public void setPreco(BigDecimal preco) {
         this.preco = preco;
     }
 
@@ -75,24 +74,11 @@ public class Produto {
         this.imagem = imagem;
     }
 
-    public Timestamp getDataCadastro() {
-        return dataCadastro;
+    public Timestamp getDataCriacao() {
+        return dataCriacao;
     }
 
-    public void setDataCadastro(Timestamp dataCadastro) {
-        this.dataCadastro = dataCadastro;
-    }
-
-    public String getImagemBase64() {
-        if (this.imagem != null) {
-            return Base64.getEncoder().encodeToString(this.imagem);
-        }
-        return null;
-    }
-
-
-    public String getPrecoFormatado() {
-        NumberFormat formatador = NumberFormat.getCurrencyInstance(new Locale("pt", "BR"));
-        return formatador.format(preco);
+    public void setDataCriacao(Timestamp dataCriacao) {
+        this.dataCriacao = dataCriacao;
     }
 }

@@ -1,37 +1,25 @@
 package com.example.Modelo;
-import java.sql.Timestamp;
 
 import java.math.BigDecimal;
-
+import java.sql.Timestamp;
 
 public class Pedido {
     private int id;
-    private int cliente_id;
+    private int clienteId;
     private Timestamp dataPedido;
     private BigDecimal total;
     private String status;
 
-    public Pedido(int id,int cliente_id,java.sql.Timestamp timestamp,BigDecimal total,String status){
+    // Construtor
+    public Pedido(int id, int clienteId, Timestamp dataPedido, BigDecimal total, String status) {
         this.id = id;
-        this.cliente_id = cliente_id;
-        this.dataPedido = dataPedido;
-        this.total = total;
-        this.status = status;
-
-
-    }
-
-    public Pedido(int cliente_id,Timestamp dataPedido,BigDecimal total,String status){
-        this.cliente_id = cliente_id;
+        this.clienteId = clienteId;
         this.dataPedido = dataPedido;
         this.total = total;
         this.status = status;
     }
 
-    public Pedido() {
-        //TODO Auto-generated constructor stub
-    }
-
+    // Getters e Setters
     public int getId() {
         return id;
     }
@@ -41,14 +29,14 @@ public class Pedido {
     }
 
     public int getClienteId() {
-        return cliente_id;
+        return clienteId;
     }
 
     public void setClienteId(int clienteId) {
-        this.cliente_id = clienteId;
+        this.clienteId = clienteId;
     }
 
-    public java.sql.Timestamp getDataPedido() {
+    public Timestamp getDataPedido() {
         return dataPedido;
     }
 

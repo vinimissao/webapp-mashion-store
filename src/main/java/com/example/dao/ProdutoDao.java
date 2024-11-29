@@ -1,12 +1,8 @@
 package com.example.dao;
 
-import com.example.Conexao.Conexao;
 import com.example.Modelo.Produto;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Timestamp;
+
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,21 +10,27 @@ public class ProdutoDao {
 
     private Connection connection;
 
-    public ProdutoDao() throws SQLException {
-        Conexao cf = new Conexao();
-        this.connection = cf.getConnection();
+    public ProdutoDao(Connection connection) {
+        this.connection = connection;
     }
 
     public void adicionarProduto(Produto produto) throws SQLException {
-        String sql = "INSERT INTO produtos (nome, descricao, preco, estoque, imagem, data_cadastro) VALUES (?, ?, ?, ?, ?, ?)";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        String sql = "INSERT INTO produtos (nome, descricao, preco, estoque, imagem, data_criacao) VALUES (?, ?, ?, ?, ?, ?)";
+        try (PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, produto.getNome());
             stmt.setString(2, produto.getDescricao());
-            stmt.setDouble(3, produto.getPreco());
+            stmt.setBigDecimal(3, produto.getPreco());
             stmt.setInt(4, produto.getEstoque());
-            stmt.setBytes(5, produto.getImagem());  // Armazenando a imagem como BLOB
-            stmt.setTimestamp(6, produto.getDataCadastro() != null ? produto.getDataCadastro() : new Timestamp(System.currentTimeMillis()));
+            stmt.setBytes(5, produto.getImagem());
+            stmt.setTimestamp(6, produto.getDataCriacao());
             stmt.executeUpdate();
+
+            // Captura o ID gerado após a inserção
+            try (ResultSet rs = stmt.getGeneratedKeys()) {
+                if (rs.next()) {
+                    produto.setId(rs.getInt(1));
+                }
+            }
         }
     }
 
@@ -37,9 +39,9 @@ public class ProdutoDao {
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, produto.getNome());
             stmt.setString(2, produto.getDescricao());
-            stmt.setDouble(3, produto.getPreco());
+            stmt.setBigDecimal(3, produto.getPreco());
             stmt.setInt(4, produto.getEstoque());
-            stmt.setBytes(5, produto.getImagem());  // Atualizando a imagem como BLOB
+            stmt.setBytes(5, produto.getImagem());
             stmt.setInt(6, produto.getId());
             stmt.executeUpdate();
         }
@@ -53,42 +55,44 @@ public class ProdutoDao {
         }
     }
 
-
     public Produto buscarProdutoPorId(int id) throws SQLException {
         String sql = "SELECT * FROM produtos WHERE id = ?";
-        Produto produto = null;
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, id);
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    produto = mapearProduto(rs);
-                }
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return new Produto(
+                        rs.getInt("id"),
+                        rs.getString("nome"),
+                        rs.getString("descricao"),
+                        rs.getBigDecimal("preco"),
+                        rs.getInt("estoque"),
+                        rs.getBytes("imagem"),
+                        rs.getTimestamp("data_criacao")
+                );
             }
         }
-        return produto;
+        return null;
     }
 
     public List<Produto> listarProdutos() throws SQLException {
-        String sql = "SELECT * FROM produtos";
         List<Produto> produtos = new ArrayList<>();
-        try (PreparedStatement stmt = connection.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
+        String sql = "SELECT * FROM produtos";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
-                produtos.add(mapearProduto(rs));
+                Produto produto = new Produto(
+                        rs.getInt("id"),
+                        rs.getString("nome"),
+                        rs.getString("descricao"),
+                        rs.getBigDecimal("preco"),
+                        rs.getInt("estoque"),
+                        rs.getBytes("imagem"),
+                        rs.getTimestamp("data_criacao")
+                );
+                produtos.add(produto);
             }
         }
         return produtos;
-    }
-
-    private Produto mapearProduto(ResultSet rs) throws SQLException {
-        Produto produto = new Produto();
-        produto.setId(rs.getInt("id"));
-        produto.setNome(rs.getString("nome"));
-        produto.setDescricao(rs.getString("descricao"));
-        produto.setPreco(rs.getDouble("preco"));
-        produto.setEstoque(rs.getInt("estoque"));
-        produto.setImagem(rs.getBytes("imagem"));  // Lendo o BLOB como byte[]
-        produto.setDataCadastro(rs.getTimestamp("data_cadastro"));
-        return produto;
     }
 }

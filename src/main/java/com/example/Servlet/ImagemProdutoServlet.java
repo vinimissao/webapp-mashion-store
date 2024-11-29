@@ -2,50 +2,81 @@ package com.example.Servlet;
 
 import com.example.Modelo.Produto;
 import com.example.dao.ProdutoDao;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 
+import javax.servlet.ServletException;
+import javax.servlet.annotation.MultipartConfig;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.*;
 import java.io.IOException;
-import java.io.OutputStream;
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.SQLException;
+import javax.servlet.http.Part;
 
-@WebServlet("/ImagemProdutoServlet")
+@WebServlet("/imagemProduto")
+@MultipartConfig(maxFileSize = 1024 * 1024 * 5) // Limite de 5MB
 public class ImagemProdutoServlet extends HttpServlet {
+
     private ProdutoDao produtoDao;
 
     @Override
-    public void init() {
+    public void init() throws ServletException {
         try {
-            produtoDao = new ProdutoDao();
+            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/sua_base", "usuario", "senha");
+            produtoDao = new ProdutoDao(connection);
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new ServletException("Erro ao inicializar o servlet: " + e.getMessage(), e);
         }
     }
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        int produtoId = Integer.parseInt(request.getParameter("id"));
-
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {
-            Produto produto = produtoDao.buscarProdutoPorId(produtoId);
-            if (produto != null && produto.getImagem() != null) {
-                byte[] imagem = produto.getImagem();
+            // Recupera o ID do produto
+            int id = Integer.parseInt(req.getParameter("produtoId"));
+            
+            // Recupera a imagem
+            Part imagem = req.getPart("imagem");
 
-                response.setContentType("image/jpeg");
-                response.setContentLength(imagem.length);
+            // Verifica se o arquivo de imagem foi enviado e possui tamanho válido
+            if (imagem != null && imagem.getSize() > 0) {
+                // Lê os bytes da imagem
+                byte[] imagemBytes = imagem.getInputStream().readAllBytes();
 
-                OutputStream os = response.getOutputStream();
-                os.write(imagem);
-                os.flush();
+                // Busca o produto no banco de dados
+                Produto produto = produtoDao.buscarProdutoPorId(id);
+                if (produto != null) {
+                    // Atualiza a imagem do produto
+                    produto.setImagem(imagemBytes);
+                    produtoDao.atualizarProduto(produto);
+                }
             } else {
-                response.sendError(HttpServletResponse.SC_NOT_FOUND);
+                req.setAttribute("mensagemErro", "Nenhuma imagem foi selecionada.");
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Erro ao carregar imagem");
+            resp.sendRedirect("produtos");
+        } catch (Exception e) {
+            throw new ServletException("Erro ao processar a imagem: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        try {
+            // Recupera o ID do produto
+            int id = Integer.parseInt(req.getParameter("produtoId"));
+
+            // Busca o produto pelo ID
+            Produto produto = produtoDao.buscarProdutoPorId(id);
+
+            // Se o produto e a imagem existirem, envia a imagem para o cliente
+            if (produto != null && produto.getImagem() != null) {
+                resp.setContentType("image/jpeg");
+                resp.getOutputStream().write(produto.getImagem());
+            } else {
+                resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Imagem não encontrada para este produto.");
+            }
+        } catch (Exception e) {
+            throw new ServletException("Erro ao recuperar a imagem: " + e.getMessage(), e);
         }
     }
 }
