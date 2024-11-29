@@ -26,8 +26,13 @@
     <h1>Painel de Administração</h1>
     <a onclick="mostrarSecao('listarProdutos')">Listar Produtos</a>
     <a onclick="mostrarSecao('incluirProduto')">Incluir Produto</a>
-    <a onclick="mostrarSecao('gerarRelatorioResumido')">Listar Produtos</a>
-    <a onclick="mostrarSecao('gerarRelatorioDetalhado')">Incluir Produto</a>
+    <a onclick="mostrarSecao('gerarRelatorioResumido')">Relatório Resumido</a>
+    <a onclick="mostrarSecao('gerarRelatorioDetalhado')">Relatório Detalhado</a>
+    <nav>
+        <ul>
+            <li><a href="Index.jsp">Home</a></li>
+        </ul>
+    </nav>
 </div>
 
 <!-- Conteúdo Principal -->
@@ -156,13 +161,13 @@
         </tr>
         <c:forEach var="item" items="${relatorioDetalhado}">
             <tr>
-                <td>${item.produto}</td>
-                <td>${item.quantidade}</td>
+                <td>${item[2]}</td> <!-- Produto -->
+                <td>${item[3]}</td> <!-- Quantidade -->
                 <td>
-                    <fmt:formatNumber value="${item.precoUnitario}" type="currency" currencySymbol="R$" />
+                    <fmt:formatNumber value="${item[4]}" type="currency" currencySymbol="R$" />
                 </td>
                 <td>
-                    <fmt:formatNumber value="${item.subtotal}" type="currency" currencySymbol="R$" />
+                    <fmt:formatNumber value="${item[5]}" type="currency" currencySymbol="R$" />
                 </td>
             </tr>
         </c:forEach>

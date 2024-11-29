@@ -31,6 +31,7 @@ public class RelatorioServlet extends HttpServlet {
                 gerarRelatorioDetalhado(request, response, produtoDao);
             } else {
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Tipo de relatório inválido!");
+                response.sendRedirect("adminDashboard.jsp");
             }
         } finally {
             try {

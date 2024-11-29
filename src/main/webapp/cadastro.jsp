@@ -63,6 +63,7 @@
     </form>
 
     <span class="psw">Back to <a href="login.jsp">login?</a></span>
+    <span class="psw">Back to <a href="Index.jsp">home</a></span>
 </div>
 </body>
 </html>

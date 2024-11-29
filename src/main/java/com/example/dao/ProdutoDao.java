@@ -138,7 +138,7 @@ public class ProdutoDao {
                        p.data_pedido
                 FROM pedidos p
                 JOIN clientes c ON p.cliente_id = c.id
-                JOIN usuarios u ON c.usuario_id = u.id
+                JOIN usuarios u ON c.usuario_id = u.cpf
                 JOIN itens_pedido ip ON p.id = ip.pedido_id
                 JOIN produtos pr ON ip.produto_id = pr.id
                 WHERE p.id = ?

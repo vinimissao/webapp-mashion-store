@@ -39,7 +39,7 @@ public class LoginServlet extends HttpServlet {
             if (usuarioLogado.isAdmin()) {
                 response.sendRedirect("ProdutoServlet");
             } else {
-                response.sendRedirect("clientDashboard.jsp");
+                response.sendRedirect("Index.jsp");
             }
         } else {
             request.setAttribute("errorMessage", "Email ou senha inválidos.");

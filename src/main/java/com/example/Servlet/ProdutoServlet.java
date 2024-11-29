@@ -171,8 +171,16 @@ public class ProdutoServlet extends HttpServlet {
 
     private void listarProdutos(HttpServletRequest request, HttpServletResponse response) throws SQLException, IOException, ServletException {
         List<Produto> produtos = produtoDao.listarProdutos();
-        request.setAttribute("produtos", produtos);
-        request.getRequestDispatcher("adminDashboard.jsp").forward(request, response);
+        request.setAttribute("produtos", produtos);  // Certifique-se que os produtos estão sendo passados corretamente.
+
+        HttpSession session = request.getSession();
+        Boolean isAdmin = (Boolean) session.getAttribute("isAdmin");
+
+        if (isAdmin != null && isAdmin) {
+            request.getRequestDispatcher("adminDashboard.jsp").forward(request, response);  // Redireciona para o painel de administração, se for admin.
+        } else {
+            request.getRequestDispatcher("index.jsp").forward(request, response);  // Certifique-se de redirecionar corretamente para a página inicial.
+        }
     }
 
     private void forwardWithError(HttpServletRequest request, HttpServletResponse response, String errorMessage) throws ServletException, IOException {

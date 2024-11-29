@@ -40,7 +40,7 @@
 
         <p>Não tem cadastro?</p>
         <button type="button" onclick="location.href='<%= request.getContextPath() %>/cadastro.jsp'">Criar conta</button>
-        <span class="psw">Back to <a href="<%= request.getContextPath() %>/home.jsp">Home</a></span>
+        <span class="psw">Back to <a href="<%= request.getContextPath() %>/Index.jsp">Home</a></span>
     </form>
 
 </div>
