@@ -26,6 +26,8 @@
     <h1>Painel de Administração</h1>
     <a onclick="mostrarSecao('listarProdutos')">Listar Produtos</a>
     <a onclick="mostrarSecao('incluirProduto')">Incluir Produto</a>
+    <a onclick="mostrarSecao('gerarRelatorioResumido')">Relatório Resumido</a>
+    <a onclick="mostrarSecao('gerarRelatorioDetalhado')">Relatório Detalhado</a>
 </div>
 
 <!-- Conteúdo Principal -->
@@ -117,6 +119,54 @@
 
         <button type="submit">Salvar Produto</button>
     </form>
+</div>
+
+<div id="gerarRelatorioResumido" class="conteudo">
+    <h2>Relatório Resumido</h2>
+    <table border="1" cellspacing="0" cellpadding="10">
+        <tr>
+            <th>Cliente</th>
+            <th>Total de Vendas</th>
+        </tr>
+        <c:forEach var="linha" items="${relatorioResumido}">
+            <tr>
+                <td>${linha.cliente}</td>
+                <td>
+                    <fmt:formatNumber value="${linha.totalVendas}" type="currency" currencySymbol="R$" />
+                </td>
+            </tr>
+        </c:forEach>
+    </table>
+</div>
+
+<div id="gerarRelatorioDetalhado" class="conteudo">
+    <h2>Relatório Detalhado</h2>
+    <form action="relatorio" method="get">
+        <input type="hidden" name="tipo" value="detalhado">
+        <label for="pedidoId">ID do Pedido:</label>
+        <input type="text" id="pedidoId" name="pedidoId" required>
+        <button type="submit">Gerar Relatório</button>
+    </form>
+    <table border="1" cellspacing="0" cellpadding="10">
+        <tr>
+            <th>Produto</th>
+            <th>Quantidade</th>
+            <th>Preço Unitário</th>
+            <th>Subtotal</th>
+        </tr>
+        <c:forEach var="item" items="${relatorioDetalhado}">
+            <tr>
+                <td>${item.produto}</td>
+                <td>${item.quantidade}</td>
+                <td>
+                    <fmt:formatNumber value="${item.precoUnitario}" type="currency" currencySymbol="R$" />
+                </td>
+                <td>
+                    <fmt:formatNumber value="${item.subtotal}" type="currency" currencySymbol="R$" />
+                </td>
+            </tr>
+        </c:forEach>
+    </table>
 </div>
 </body>
 </html>

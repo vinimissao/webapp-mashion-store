@@ -19,6 +19,12 @@ public class ProdutoDao {
         this.connection = cf.getConnection();
     }
 
+    public void close() throws SQLException {
+        if (connection != null && !connection.isClosed()) {
+            connection.close();
+        }
+    }
+
     public void adicionarProduto(Produto produto) throws SQLException {
         String sql = "INSERT INTO produtos (nome, descricao, preco, estoque, imagem, data_cadastro) VALUES (?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
@@ -90,5 +96,70 @@ public class ProdutoDao {
         produto.setImagem(rs.getBytes("imagem"));  // Lendo o BLOB como byte[]
         produto.setDataCadastro(rs.getTimestamp("data_cadastro"));
         return produto;
+    }
+
+
+    public List<Object[]> relatorioResumidoVendasPorCliente() throws SQLException {
+        String sql = """
+                SELECT u.nome AS cliente, 
+                       COUNT(p.id) AS total_pedidos, 
+                       SUM(ip.quantidade * pr.preco) AS total_gasto
+                FROM pedidos p
+                JOIN clientes c ON p.cliente_id = c.id
+                JOIN usuarios u ON c.usuario_id = u.id
+                JOIN itens_pedido ip ON p.id = ip.pedido_id
+                JOIN produtos pr ON ip.produto_id = pr.id
+                WHERE DATE(p.data_pedido) = CURDATE()
+                GROUP BY u.id, u.nome
+                ORDER BY total_gasto DESC
+                """;
+        List<Object[]> relatorio = new ArrayList<>();
+        try (PreparedStatement stmt = connection.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                relatorio.add(new Object[]{
+                        rs.getString("cliente"),
+                        rs.getInt("total_pedidos"),
+                        rs.getDouble("total_gasto")
+                });
+            }
+        }
+        return relatorio;
+    }
+
+    public List<Object[]> relatorioDetalhadoPorPedido(int pedidoId) throws SQLException {
+        String sql = """
+                SELECT p.id AS pedido_id,
+                       u.nome AS cliente,
+                       pr.nome AS produto,
+                       ip.quantidade,
+                       pr.preco,
+                       (ip.quantidade * pr.preco) AS total_item,
+                       p.data_pedido
+                FROM pedidos p
+                JOIN clientes c ON p.cliente_id = c.id
+                JOIN usuarios u ON c.usuario_id = u.id
+                JOIN itens_pedido ip ON p.id = ip.pedido_id
+                JOIN produtos pr ON ip.produto_id = pr.id
+                WHERE p.id = ?
+                """;
+        List<Object[]> relatorio = new ArrayList<>();
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, pedidoId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    relatorio.add(new Object[]{
+                            rs.getInt("pedido_id"),
+                            rs.getString("cliente"),
+                            rs.getString("produto"),
+                            rs.getInt("quantidade"),
+                            rs.getDouble("preco"),
+                            rs.getDouble("total_item"),
+                            rs.getTimestamp("data_pedido")
+                    });
+                }
+            }
+        }
+        return relatorio;
     }
 }

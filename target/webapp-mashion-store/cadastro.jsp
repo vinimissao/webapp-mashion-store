@@ -14,7 +14,6 @@
     <h2>Cadastro</h2>
     <p>Preencha os campos abaixo para criar uma nova conta.</p>
 
-    <!-- Display success or error messages -->
     <%
         String errorMessage = (String) request.getAttribute("errorMessage");
         String successMessage = (String) request.getAttribute("successMessage");
@@ -30,7 +29,6 @@
         }
     %>
 
-    <!-- Formulário de Cadastro -->
     <form action="Cadastrar" method="post">
         <div class="tipo-cadastro">
             <label>

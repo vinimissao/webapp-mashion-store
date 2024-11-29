@@ -9,5 +9,8 @@
         <module name="webapp-mashion-store" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="demo" target="15" />
+    </bytecodeTargetLevel>
   </component>
 </project>
