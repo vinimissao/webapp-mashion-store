@@ -1,0 +1,102 @@
+/* Reset básico para margens e preenchimentos */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+/* Estilização geral do corpo */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #3C0809; /* Fundo na cor vinho */
+    color: #333;
+}
+
+/* Container central para o formulário de login */
+.login-container {
+    background-color: #FFFFFF; /* Fundo dourado */
+    width: 400px;
+    margin: 100px auto; /* Centraliza o container na página */
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Estilizando o título de login */
+.login-container h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+/* Estilizando campos de entrada */
+.login-container input[type="email"],
+.login-container input[type="password"] {
+    width: calc(100% - 20px); /* Ajuste para usar o espaço corretamente */
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    transition: all 0.3s ease; /* Adiciona uma transição suave */
+}
+
+/* Ajustando o container de senha */
+.password-container {
+    position: relative;
+    width: 100%; /* Faz o container ocupar toda a largura */
+}
+
+.password-container input {
+    width: calc(100% - 40px); /* Ajusta o input dentro do container */
+    padding-right: 40px;
+    box-sizing: border-box;
+}
+
+.password-container button {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    padding: 0;
+    width: 20px;
+    height: 20px;
+}
+
+/* Estilizando o botão de submit */
+.login-container button[type="submit"] {
+    background-color: #3C0809; /* Botão rosa */
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 100%;
+    font-size: 16px;
+    margin-top: 20px; /* Espaçamento entre o botão e o resto */
+}
+
+
+.login-container button:hover {
+    background-color: #05431a; /* Efeito ao passar o mouse */
+}
+
+/* Estilizando o link de "Esqueci minha senha" */
+.login-container a, p {
+    display: block;
+    margin-top: 10px;
+    text-decoration: none;
+    color: #333;
+}
+
+/* Estilização da imagem */
+.login-container img {
+    width: 100px; /* Define a largura da imagem */
+    height: auto; /* Mantém a proporção da imagem */
+    margin-bottom: 20px; /* Espaço entre a imagem e o título */
+}
