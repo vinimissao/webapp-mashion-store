@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <!-- Cabeçalho -->
+    
     <header>
         <div class="logo">
             <img src="images/logo.png" alt="MashionStore Logo">
@@ -23,7 +23,7 @@
         </nav>
     </header>
 
-    <!-- Carrinho de Compras -->
+    
     <section id="carrinho">
         <div class="container">
             <h2>Seu Carrinho de Compras</h2>
@@ -61,7 +61,7 @@
         </div>
     </section>
 
-    <!-- Rodapé -->
+ 
     <footer>
         <p>&copy; 2024 MashionStore - Todos os direitos reservados</p>
     </footer>

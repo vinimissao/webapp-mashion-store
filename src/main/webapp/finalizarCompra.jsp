@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <!-- Cabeçalho -->
+   
     <header>
         <div class="logo">
             <img src="images/logo.png" alt="MashionStore Logo">
@@ -23,12 +23,12 @@
         </nav>
     </header>
 
-    <!-- Finalizar Compra -->
+  
     <section id="finalizar-compra">
         <div class="container">
             <h2>Resumo da Compra</h2>
 
-            <!-- Exibe o Resumo do Carrinho -->
+           
             <c:if test="${not empty carrinho}">
                 <table>
                     <thead>
@@ -50,7 +50,7 @@
                 </table>
             </c:if>
 
-            <!-- Dados do Cliente -->
+           
             <h3>Dados de Entrega</h3>
             <form action="processarCompra.jsp" method="post">
                 <label for="endereco">Endereço de Entrega</label>
@@ -65,7 +65,7 @@
                 <label for="telefone">Telefone</label>
                 <input type="text" id="telefone" name="telefone" value="${cliente.telefone}" required>
 
-                <!-- Finalização da Compra -->
+                
                 <div class="total">
                     <p><strong>Total: R$ ${total}</strong></p>
                     <button type="submit" class="btn-finalizar">Confirmar Compra</button>

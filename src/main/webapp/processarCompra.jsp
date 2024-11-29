@@ -17,7 +17,6 @@
                 <li><a href="index.jsp">Home</a></li>
                 <li><a href="carrinho.jsp">Carrinho</a></li>
                 <li><a href="login.jsp">Login</a></li>
-                <li><a href="#contato">Contato</a></li>
             </ul>
         </nav>
     </header>
